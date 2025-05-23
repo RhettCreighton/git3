@@ -99,10 +99,10 @@ static int reftable_backend_read_ref(struct reftable_backend *be,
 
 		switch (reftable_stack_hash_id(be->stack)) {
 		case REFTABLE_HASH_SHA1:
-			hash_id = GIT_HASH_SHA1;
+			hash_id = GIT_HASH_SHA3;
 			break;
 		case REFTABLE_HASH_SHA256:
-			hash_id = GIT_HASH_SHA256;
+			hash_id = GIT_HASH_SHA3;
 			break;
 		default:
 			BUG("unhandled hash ID %d", reftable_stack_hash_id(be->stack));
@@ -371,10 +371,8 @@ static struct ref_store *reftable_be_init(struct repository *repo,
 	refs->log_all_ref_updates = repo_settings_get_log_all_ref_updates(repo);
 
 	switch (repo->hash_algo->format_id) {
-	case GIT_SHA1_FORMAT_ID:
-		refs->write_options.hash_id = REFTABLE_HASH_SHA1;
-		break;
-	case GIT_SHA256_FORMAT_ID:
+	case GIT_SHA3_FORMAT_ID:
+		/* SHA3-256 - we'll use REFTABLE_HASH_SHA256 for now as it's 32 bytes */
 		refs->write_options.hash_id = REFTABLE_HASH_SHA256;
 		break;
 	default:

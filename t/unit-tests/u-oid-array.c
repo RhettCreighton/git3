@@ -116,7 +116,7 @@ void test_oid_array__lookup_almost_dup(void)
 {
 	const char *nearly_55;
 
-	nearly_55 = cl_setup_hash_algo() == GIT_HASH_SHA1 ?
+	nearly_55 = cl_setup_hash_algo() == GIT_HASH_SHA3 ?
 			"5500000000000000000000000000000000000001" :
 			"5500000000000000000000000000000000000000000000000000000000000001";
 

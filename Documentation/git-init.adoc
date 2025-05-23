@@ -9,17 +9,17 @@ git-init - Create an empty Git repository or reinitialize an existing one
 SYNOPSIS
 --------
 [synopsis]
-git init [-q | --quiet] [--bare] [--template=<template-directory>]
-	 [--separate-git-dir <git-dir>] [--object-format=<format>]
-	 [--ref-format=<format>]
-	 [-b <branch-name> | --initial-branch=<branch-name>]
-	 [--shared[=<permissions>]] [<directory>]
+git3 init [-q | --quiet] [--bare] [--template=<template-directory>]
+	  [--separate-git-dir <git-dir>] [--object-format=<format>]
+	  [--ref-format=<format>]
+	  [-b <branch-name> | --initial-branch=<branch-name>]
+	  [--shared[=<permissions>]] [<directory>]
 
 
 DESCRIPTION
 -----------
 
-This command creates an empty Git repository - basically a `.git`
+This command creates an empty Git3 repository - basically a `.git`
 directory with subdirectories for `objects`, `refs/heads`,
 `refs/tags`, and template files.  An initial branch without any
 commits will be created (see the `--initial-branch` option below
@@ -52,8 +52,8 @@ Create a bare repository. If `GIT_DIR` environment is not set, it is set to the
 current working directory.
 
 `--object-format=<format>`::
-Specify the given object _<format>_ (hash algorithm) for the repository.  The valid
-values are `sha1` and (if enabled) `sha256`.  `sha1` is the default.
+Specify the given object _<format>_ (hash algorithm) for the repository.  The only valid
+value is `sha3`.  `sha3` is the default and only supported algorithm.
 +
 include::object-format-disclaimer.adoc[]
 

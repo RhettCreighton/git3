@@ -1,158 +1,28 @@
 #ifndef HASH_H
 #define HASH_H
 
-#if defined(SHA1_APPLE)
-#define SHA1_BACKEND "SHA1_APPLE (No collision detection)"
-#include <CommonCrypto/CommonDigest.h>
-#elif defined(SHA1_OPENSSL)
-#  define SHA1_BACKEND "SHA1_OPENSSL (No collision detection)"
-#  include <openssl/sha.h>
-#  if defined(OPENSSL_API_LEVEL) && OPENSSL_API_LEVEL >= 3
-#    define SHA1_NEEDS_CLONE_HELPER
-#    include "sha1/openssl.h"
-#  endif
-#elif defined(SHA1_DC)
-#define SHA1_BACKEND "SHA1_DC"
-#include "sha1dc_git.h"
-#else /* SHA1_BLK */
-#define SHA1_BACKEND "SHA1_BLK (No collision detection)"
-#include "block-sha1/sha1.h"
+/* SHA3-256 is the only supported hash algorithm */
+#define SHA3_BACKEND "SHA3_BLK"
+#include "sha3/block/sha3.h"
+
+#ifndef platform_SHA3_CTX
+#define platform_SHA3_CTX	blk_SHA3_CTX
+#define platform_SHA3_Init	blk_SHA3_Init
+#define platform_SHA3_Update	blk_SHA3_Update
+#define platform_SHA3_Final	blk_SHA3_Final
 #endif
 
-#if defined(SHA1_APPLE_UNSAFE)
-#  define SHA1_UNSAFE_BACKEND "SHA1_APPLE_UNSAFE"
-#  include <CommonCrypto/CommonDigest.h>
-#  define platform_SHA_CTX_unsafe CC_SHA1_CTX
-#  define platform_SHA1_Init_unsafe CC_SHA1_Init
-#  define platform_SHA1_Update_unsafe CC_SHA1_Update
-#  define platform_SHA1_Final_unsafe CC_SHA1_Final
-#elif defined(SHA1_OPENSSL_UNSAFE)
-#  define SHA1_UNSAFE_BACKEND "SHA1_OPENSSL_UNSAFE"
-#  include <openssl/sha.h>
-#  if defined(OPENSSL_API_LEVEL) && OPENSSL_API_LEVEL >= 3
-#    define SHA1_NEEDS_CLONE_HELPER_UNSAFE
-#    include "sha1/openssl.h"
-#    define platform_SHA_CTX_unsafe openssl_SHA1_CTX
-#    define platform_SHA1_Init_unsafe openssl_SHA1_Init
-#    define platform_SHA1_Clone_unsafe openssl_SHA1_Clone
-#    define platform_SHA1_Update_unsafe openssl_SHA1_Update
-#    define platform_SHA1_Final_unsafe openssl_SHA1_Final
-#  else
-#    define platform_SHA_CTX_unsafe SHA_CTX
-#    define platform_SHA1_Init_unsafe SHA1_Init
-#    define platform_SHA1_Update_unsafe SHA1_Update
-#    define platform_SHA1_Final_unsafe SHA1_Final
-#  endif
-#elif defined(SHA1_BLK_UNSAFE)
-#  define SHA1_UNSAFE_BACKEND "SHA1_BLK_UNSAFE"
-#  include "block-sha1/sha1.h"
-#  define platform_SHA_CTX_unsafe blk_SHA_CTX
-#  define platform_SHA1_Init_unsafe blk_SHA1_Init
-#  define platform_SHA1_Update_unsafe blk_SHA1_Update
-#  define platform_SHA1_Final_unsafe blk_SHA1_Final
+#define git_SHA3_CTX		platform_SHA3_CTX
+#define git_SHA3_Init		platform_SHA3_Init
+#define git_SHA3_Update		platform_SHA3_Update
+#define git_SHA3_Final		platform_SHA3_Final
+
+#ifdef platform_SHA3_Clone
+#define git_SHA3_Clone	platform_SHA3_Clone
 #endif
 
-#if defined(SHA256_NETTLE)
-#define SHA256_BACKEND "SHA256_NETTLE"
-#include "sha256/nettle.h"
-#elif defined(SHA256_GCRYPT)
-#define SHA256_BACKEND "SHA256_GCRYPT"
-#define SHA256_NEEDS_CLONE_HELPER
-#include "sha256/gcrypt.h"
-#elif defined(SHA256_OPENSSL)
-#  define SHA256_BACKEND "SHA256_OPENSSL"
-#  include <openssl/sha.h>
-#  if defined(OPENSSL_API_LEVEL) && OPENSSL_API_LEVEL >= 3
-#    define SHA256_NEEDS_CLONE_HELPER
-#    include "sha256/openssl.h"
-#  endif
-#else
-#define SHA256_BACKEND "SHA256_BLK"
-#include "sha256/block/sha256.h"
-#endif
-
-#ifndef platform_SHA_CTX
-/*
- * platform's underlying implementation of SHA-1; could be OpenSSL,
- * blk_SHA, Apple CommonCrypto, etc...  Note that the relevant
- * SHA-1 header may have already defined platform_SHA_CTX for our
- * own implementations like block-sha1, so we list
- * the default for OpenSSL compatible SHA-1 implementations here.
- */
-#define platform_SHA_CTX	SHA_CTX
-#define platform_SHA1_Init	SHA1_Init
-#define platform_SHA1_Update	SHA1_Update
-#define platform_SHA1_Final    	SHA1_Final
-#endif
-
-#ifndef platform_SHA_CTX_unsafe
-#  define platform_SHA_CTX_unsafe      platform_SHA_CTX
-#  define platform_SHA1_Init_unsafe    platform_SHA1_Init
-#  define platform_SHA1_Update_unsafe  platform_SHA1_Update
-#  define platform_SHA1_Final_unsafe   platform_SHA1_Final
-#  ifdef platform_SHA1_Clone
-#    define platform_SHA1_Clone_unsafe platform_SHA1_Clone
-#  endif
-#  ifdef SHA1_NEEDS_CLONE_HELPER
-#    define SHA1_NEEDS_CLONE_HELPER_UNSAFE
-#  endif
-#endif
-
-#define git_SHA_CTX		platform_SHA_CTX
-#define git_SHA1_Init		platform_SHA1_Init
-#define git_SHA1_Update		platform_SHA1_Update
-#define git_SHA1_Final		platform_SHA1_Final
-
-#define git_SHA_CTX_unsafe	platform_SHA_CTX_unsafe
-#define git_SHA1_Init_unsafe	platform_SHA1_Init_unsafe
-#define git_SHA1_Update_unsafe	platform_SHA1_Update_unsafe
-#define git_SHA1_Final_unsafe	platform_SHA1_Final_unsafe
-
-#ifdef platform_SHA1_Clone
-#define git_SHA1_Clone	platform_SHA1_Clone
-#endif
-#ifdef platform_SHA1_Clone_unsafe
-#  define git_SHA1_Clone_unsafe platform_SHA1_Clone_unsafe
-#endif
-
-#ifndef platform_SHA256_CTX
-#define platform_SHA256_CTX	SHA256_CTX
-#define platform_SHA256_Init	SHA256_Init
-#define platform_SHA256_Update	SHA256_Update
-#define platform_SHA256_Final	SHA256_Final
-#endif
-
-#define git_SHA256_CTX		platform_SHA256_CTX
-#define git_SHA256_Init		platform_SHA256_Init
-#define git_SHA256_Update	platform_SHA256_Update
-#define git_SHA256_Final	platform_SHA256_Final
-
-#ifdef platform_SHA256_Clone
-#define git_SHA256_Clone	platform_SHA256_Clone
-#endif
-
-#ifdef SHA1_MAX_BLOCK_SIZE
-#include "compat/sha1-chunked.h"
-#undef git_SHA1_Update
-#define git_SHA1_Update		git_SHA1_Update_Chunked
-#endif
-
-#ifndef SHA1_NEEDS_CLONE_HELPER
-static inline void git_SHA1_Clone(git_SHA_CTX *dst, const git_SHA_CTX *src)
-{
-	memcpy(dst, src, sizeof(*dst));
-}
-#endif
-#ifndef SHA1_NEEDS_CLONE_HELPER_UNSAFE
-static inline void git_SHA1_Clone_unsafe(git_SHA_CTX_unsafe *dst,
-				       const git_SHA_CTX_unsafe *src)
-{
-	memcpy(dst, src, sizeof(*dst));
-}
-#endif
-
-#ifndef SHA256_NEEDS_CLONE_HELPER
-static inline void git_SHA256_Clone(git_SHA256_CTX *dst, const git_SHA256_CTX *src)
+#ifndef SHA3_NEEDS_CLONE_HELPER
+static inline void git_SHA3_Clone(git_SHA3_CTX *dst, const git_SHA3_CTX *src)
 {
 	memcpy(dst, src, sizeof(*dst));
 }
@@ -168,36 +38,25 @@ static inline void git_SHA256_Clone(git_SHA256_CTX *dst, const git_SHA256_CTX *s
  */
 /* An unknown hash function. */
 #define GIT_HASH_UNKNOWN 0
-/* SHA-1 */
-#define GIT_HASH_SHA1 1
-/* SHA-256  */
-#define GIT_HASH_SHA256 2
+/* SHA3-256 */
+#define GIT_HASH_SHA3 1
 /* Number of algorithms supported (including unknown). */
-#define GIT_HASH_NALGOS (GIT_HASH_SHA256 + 1)
+#define GIT_HASH_NALGOS (GIT_HASH_SHA3 + 1)
 
-/* "sha1", big-endian */
-#define GIT_SHA1_FORMAT_ID 0x73686131
+/* "sha3", big-endian */
+#define GIT_SHA3_FORMAT_ID 0x73686133
 
-/* The length in bytes and in hex digits of an object name (SHA-1 value). */
-#define GIT_SHA1_RAWSZ 20
-#define GIT_SHA1_HEXSZ (2 * GIT_SHA1_RAWSZ)
-/* The block size of SHA-1. */
-#define GIT_SHA1_BLKSZ 64
-
-/* "s256", big-endian */
-#define GIT_SHA256_FORMAT_ID 0x73323536
-
-/* The length in bytes and in hex digits of an object name (SHA-256 value). */
-#define GIT_SHA256_RAWSZ 32
-#define GIT_SHA256_HEXSZ (2 * GIT_SHA256_RAWSZ)
-/* The block size of SHA-256. */
-#define GIT_SHA256_BLKSZ 64
+/* The length in bytes and in hex digits of an object name (SHA3-256 value). */
+#define GIT_SHA3_RAWSZ 32
+#define GIT_SHA3_HEXSZ (2 * GIT_SHA3_RAWSZ)
+/* The block size of SHA3-256. */
+#define GIT_SHA3_BLKSZ 136
 
 /* The length in byte and in hex digits of the largest possible hash value. */
-#define GIT_MAX_RAWSZ GIT_SHA256_RAWSZ
-#define GIT_MAX_HEXSZ GIT_SHA256_HEXSZ
+#define GIT_MAX_RAWSZ GIT_SHA3_RAWSZ
+#define GIT_MAX_HEXSZ GIT_SHA3_HEXSZ
 /* The largest possible block size for any supported hash. */
-#define GIT_MAX_BLKSZ GIT_SHA256_BLKSZ
+#define GIT_MAX_BLKSZ GIT_SHA3_BLKSZ
 
 struct object_id {
 	unsigned char hash[GIT_MAX_RAWSZ];
@@ -249,9 +108,7 @@ enum get_oid_result {
 struct git_hash_ctx {
 	const struct git_hash_algo *algop;
 	union {
-		git_SHA_CTX sha1;
-		git_SHA_CTX_unsafe sha1_unsafe;
-		git_SHA256_CTX sha256;
+		git_SHA3_CTX sha3;
 	} state;
 };
 
@@ -356,24 +213,12 @@ const struct object_id *null_oid(const struct git_hash_algo *algop);
 
 static inline int hashcmp(const unsigned char *sha1, const unsigned char *sha2, const struct git_hash_algo *algop)
 {
-	/*
-	 * Teach the compiler that there are only two possibilities of hash size
-	 * here, so that it can optimize for this case as much as possible.
-	 */
-	if (algop->rawsz == GIT_MAX_RAWSZ)
-		return memcmp(sha1, sha2, GIT_MAX_RAWSZ);
-	return memcmp(sha1, sha2, GIT_SHA1_RAWSZ);
+	return memcmp(sha1, sha2, algop->rawsz);
 }
 
 static inline int hasheq(const unsigned char *sha1, const unsigned char *sha2, const struct git_hash_algo *algop)
 {
-	/*
-	 * We write this here instead of deferring to hashcmp so that the
-	 * compiler can properly inline it and avoid calling memcmp.
-	 */
-	if (algop->rawsz == GIT_MAX_RAWSZ)
-		return !memcmp(sha1, sha2, GIT_MAX_RAWSZ);
-	return !memcmp(sha1, sha2, GIT_SHA1_RAWSZ);
+	return !memcmp(sha1, sha2, algop->rawsz);
 }
 
 static inline void hashcpy(unsigned char *sha_dst, const unsigned char *sha_src,

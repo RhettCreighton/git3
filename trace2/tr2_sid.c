@@ -30,7 +30,7 @@ static int tr2sid_nr_git_parents;
  */
 static void tr2_sid_append_my_sid_component(void)
 {
-	const struct git_hash_algo *algo = &hash_algos[GIT_HASH_SHA1];
+	const struct git_hash_algo *algo = &hash_algos[GIT_HASH_SHA3];
 	struct tr2_tbuf tb_now;
 	struct git_hash_ctx ctx;
 	pid_t pid = getpid();

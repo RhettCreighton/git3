@@ -116,9 +116,11 @@ int daemonize(void);
  * GIT_REPO_VERSION is the version we write by default. The
  * _READ variant is the highest number we know how to
  * handle.
+ * 
+ * Git3 uses version 3 to be incompatible with standard Git
  */
-#define GIT_REPO_VERSION 0
-#define GIT_REPO_VERSION_READ 1
+#define GIT_REPO_VERSION 3
+#define GIT_REPO_VERSION_READ 3
 
 /*
  * You _have_ to initialize a `struct repository_format` using
@@ -149,7 +151,7 @@ struct repository_format {
 { \
 	.version = -1, \
 	.is_bare = -1, \
-	.hash_algo = GIT_HASH_SHA1, \
+	.hash_algo = GIT_HASH_SHA3, \
 	.ref_storage_format = REF_STORAGE_FORMAT_FILES, \
 	.unknown_extensions = STRING_LIST_INIT_DUP, \
 	.v1_only_extensions = STRING_LIST_INIT_DUP, \

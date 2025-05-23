@@ -616,7 +616,7 @@ bindir = $(prefix)/bin
 mandir = $(prefix)/share/man
 infodir = $(prefix)/share/info
 bash_completion_dir = $(prefix)/share/bash-completion/completions
-gitexecdir = libexec/git-core
+gitexecdir = libexec/git3-core
 mergetoolsdir = $(gitexecdir)/mergetools
 sharedir = $(prefix)/share
 gitwebdir = $(sharedir)/gitweb
@@ -887,11 +887,11 @@ BUILT_INS += git-version$X
 BUILT_INS += git-whatchanged$X
 
 # what 'all' will build but not install in gitexecdir
-OTHER_PROGRAMS += git$X
+OTHER_PROGRAMS += git3$X
 OTHER_PROGRAMS += scalar$X
 
 # what test wrappers are needed and 'install' will install, in bindir
-BINDIR_PROGRAMS_NEED_X += git
+BINDIR_PROGRAMS_NEED_X += git3
 BINDIR_PROGRAMS_NEED_X += scalar
 BINDIR_PROGRAMS_NEED_X += git-receive-pack
 BINDIR_PROGRAMS_NEED_X += git-shell
@@ -2066,8 +2066,9 @@ ifdef GCRYPT_SHA256
 	BASIC_CFLAGS += -DSHA256_GCRYPT
 	EXTLIBS += -lgcrypt
 else
-	LIB_OBJS += sha256/block/sha256.o
-	BASIC_CFLAGS += -DSHA256_BLK
+	# SHA3 is the only supported hash algorithm
+	LIB_OBJS += sha3/block/sha3.o
+	BASIC_CFLAGS += -DSHA3_BLK
 endif
 endif
 endif
@@ -2540,7 +2541,7 @@ git.sp git.s git.o: EXTRA_CPPFLAGS = \
 	'-DGIT_MAN_PATH="$(mandir_relative_SQ)"' \
 	'-DGIT_INFO_PATH="$(infodir_relative_SQ)"'
 
-git$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
+git3$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $(ALL_LDFLAGS) \
 		$(filter %.o,$^) $(LIBS)
 

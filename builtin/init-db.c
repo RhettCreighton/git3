@@ -107,7 +107,7 @@ int cmd_init_db(int argc,
 		OPT_STRING('b', "initial-branch", &initial_branch, N_("name"),
 			   N_("override the name of the initial branch")),
 		OPT_STRING(0, "object-format", &object_format, N_("hash"),
-			   N_("specify the hash algorithm to use")),
+			   N_("specify the hash algorithm to use (only 'sha3' is supported)")),
 		OPT_STRING(0, "ref-format", &ref_format, N_("format"),
 			   N_("specify the reference format to use")),
 		OPT_END()
@@ -166,11 +166,11 @@ int cmd_init_db(int argc,
 		free(cwd);
 	}
 
-	if (object_format) {
-		hash_algo = hash_algo_by_name(object_format);
-		if (hash_algo == GIT_HASH_UNKNOWN)
-			die(_("unknown hash algorithm '%s'"), object_format);
+	/* Force SHA3 as the only supported hash algorithm */
+	if (object_format && strcmp(object_format, "sha3") != 0) {
+		die(_("only 'sha3' hash algorithm is supported, not '%s'"), object_format);
 	}
+	hash_algo = GIT_HASH_SHA3;
 
 	if (ref_format) {
 		ref_storage_format = ref_storage_format_by_name(ref_format);

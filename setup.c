@@ -853,9 +853,9 @@ void clear_repository_format(struct repository_format *format)
 int verify_repository_format(const struct repository_format *format,
 			     struct strbuf *err)
 {
-	if (GIT_REPO_VERSION_READ < format->version) {
-		strbuf_addf(err, _("Expected git repo version <= %d, found %d"),
-			    GIT_REPO_VERSION_READ, format->version);
+	if (format->version != GIT_REPO_VERSION) {
+		strbuf_addf(err, _("Git3 requires repository version %d, found %d"),
+			    GIT_REPO_VERSION, format->version);
 		return -1;
 	}
 
@@ -2216,21 +2216,12 @@ void initialize_repository_version(int hash_algo,
 	int target_version = GIT_REPO_VERSION;
 
 	/*
-	 * Note that we initialize the repository version to 1 when the ref
-	 * storage format is unknown. This is on purpose so that we can add the
-	 * correct object format to the config during git-clone(1). The format
-	 * version will get adjusted by git-clone(1) once it has learned about
-	 * the remote repository's format.
+	 * Git3 always uses repository version 3, regardless of settings
 	 */
-	if (hash_algo != GIT_HASH_SHA1 ||
-	    ref_storage_format != REF_STORAGE_FORMAT_FILES)
-		target_version = GIT_REPO_VERSION_READ;
+	target_version = GIT_REPO_VERSION;
 
-	if (hash_algo != GIT_HASH_SHA1 && hash_algo != GIT_HASH_UNKNOWN)
-		git_config_set("extensions.objectformat",
-			       hash_algos[hash_algo].name);
-	else if (reinit)
-		git_config_set_gently("extensions.objectformat", NULL);
+	/* Git3 always uses SHA3, set it explicitly */
+	git_config_set("extensions.objectformat", "sha3");
 
 	if (ref_storage_format != REF_STORAGE_FORMAT_FILES)
 		git_config_set("extensions.refstorage",
@@ -2466,8 +2457,9 @@ static int read_default_format_config(const char *key, const char *value,
 		if (ret)
 			goto out;
 		cfg->hash = hash_algo_by_name(str);
-		if (cfg->hash == GIT_HASH_UNKNOWN)
-			warning(_("unknown hash algorithm '%s'"), str);
+		if (cfg->hash == GIT_HASH_UNKNOWN || cfg->hash != GIT_HASH_SHA3)
+			warning(_("only 'sha3' hash algorithm is supported, not '%s'"), str);
+		cfg->hash = GIT_HASH_SHA3;
 		goto out;
 	}
 
@@ -2628,13 +2620,13 @@ int init_db(const char *git_dir, const char *real_git_dir,
 
 		if (reinit)
 			printf(repo_settings_get_shared_repository(the_repository)
-			       ? _("Reinitialized existing shared Git repository in %s%s\n")
-			       : _("Reinitialized existing Git repository in %s%s\n"),
+			       ? _("Reinitialized existing shared Git3 repository in %s%s\n")
+			       : _("Reinitialized existing Git3 repository in %s%s\n"),
 			       git_dir, len && git_dir[len-1] != '/' ? "/" : "");
 		else
 			printf(repo_settings_get_shared_repository(the_repository)
-			       ? _("Initialized empty shared Git repository in %s%s\n")
-			       : _("Initialized empty Git repository in %s%s\n"),
+			       ? _("Initialized empty shared Git3 repository in %s%s\n")
+			       : _("Initialized empty Git3 repository in %s%s\n"),
 			       git_dir, len && git_dir[len-1] != '/' ? "/" : "");
 	}
 

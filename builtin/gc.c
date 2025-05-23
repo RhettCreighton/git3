@@ -50,7 +50,7 @@
 #define FAILED_RUN "failed to run %s"
 
 static const char * const builtin_gc_usage[] = {
-	N_("git gc [<options>]"),
+	N_("git3 gc [<options>]"),
 	NULL
 };
 
@@ -1038,7 +1038,7 @@ out:
 }
 
 static const char *const builtin_maintenance_run_usage[] = {
-	N_("git maintenance run [--auto] [--[no-]quiet] [--task=<task>] [--schedule]"),
+	N_("git3 maintenance run [--auto] [--[no-]detach] [--[no-]quiet] [--task=<task>] [--schedule]"),
 	NULL
 };
 
@@ -1813,7 +1813,7 @@ static char *get_maintpath(void)
 }
 
 static char const * const builtin_maintenance_register_usage[] = {
-	"git maintenance register [--config-file <path>]",
+	"git3 maintenance register [--config-file <path>]",
 	NULL
 };
 
@@ -1878,7 +1878,7 @@ static int maintenance_register(int argc, const char **argv, const char *prefix,
 }
 
 static char const * const builtin_maintenance_unregister_usage[] = {
-	"git maintenance unregister [--config-file <path>] [--force]",
+	"git3 maintenance unregister [--config-file <path>] [--force]",
 	NULL
 };
 
@@ -3118,7 +3118,7 @@ static int update_background_schedule(const struct maintenance_start_opts *opts,
 }
 
 static const char *const builtin_maintenance_start_usage[] = {
-	N_("git maintenance start [--scheduler=<scheduler>]"),
+	N_("git3 maintenance start [--scheduler=<scheduler>]"),
 	NULL
 };
 
@@ -3152,7 +3152,7 @@ static int maintenance_start(int argc, const char **argv, const char *prefix,
 }
 
 static const char *const builtin_maintenance_stop_usage[] = {
-	"git maintenance stop",
+	"git3 maintenance stop",
 	NULL
 };
 
@@ -3170,7 +3170,7 @@ static int maintenance_stop(int argc, const char **argv, const char *prefix,
 }
 
 static const char * const builtin_maintenance_usage[] = {
-	N_("git maintenance <subcommand> [<options>]"),
+	N_("git3 maintenance <subcommand> [<options>]"),
 	NULL,
 };
 

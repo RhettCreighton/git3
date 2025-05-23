@@ -1552,8 +1552,9 @@ elif sha256_backend == 'gcrypt'
   libgit_dependencies += gcrypt
   libgit_c_args += '-DSHA256_GCRYPT'
 elif sha256_backend == 'block'
-  libgit_c_args += '-DSHA256_BLK'
-  libgit_sources += 'sha256/block/sha256.c'
+  # SHA3 is the only supported hash algorithm
+  libgit_c_args += '-DSHA3_BLK'
+  libgit_sources += 'sha3/block/sha3.c'
 else
   error('Unhandled SHA256 backend ' + sha256_backend)
 endif

@@ -75,7 +75,7 @@ static int load_pack_mtimes_file(char *mtimes_file,
 
 	expected_size = MTIMES_HEADER_SIZE;
 	expected_size = st_add(expected_size, st_mult(sizeof(uint32_t), num_objects));
-	expected_size = st_add(expected_size, 2 * (header.hash_id == 1 ? GIT_SHA1_RAWSZ : GIT_SHA256_RAWSZ));
+	expected_size = st_add(expected_size, 2 * GIT_SHA3_RAWSZ);
 
 	if (mtimes_size != expected_size) {
 		ret = error(_("mtimes file %s is corrupt"), mtimes_file);

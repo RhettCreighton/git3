@@ -777,7 +777,7 @@ void get_version_info(struct strbuf *buf, int show_build_options)
 	 *
 	 * Always show the version, even if other options are given.
 	 */
-	strbuf_addf(buf, "git version %s\n", git_version_string);
+	strbuf_addf(buf, "git3 version %s\n", git_version_string);
 
 	if (show_build_options) {
 		strbuf_addf(buf, "cpu: %s\n", GIT_HOST_CPU);
@@ -804,12 +804,7 @@ void get_version_info(struct strbuf *buf, int show_build_options)
 #elif defined ZLIB_VERSION
 		strbuf_addf(buf, "zlib: %s\n", ZLIB_VERSION);
 #endif
-		strbuf_addf(buf, "SHA-1: %s\n", SHA1_BACKEND);
-#if defined SHA1_UNSAFE_BACKEND
-		strbuf_addf(buf, "non-collision-detecting-SHA-1: %s\n",
-			    SHA1_UNSAFE_BACKEND);
-#endif
-		strbuf_addf(buf, "SHA-256: %s\n", SHA256_BACKEND);
+		strbuf_addf(buf, "SHA3-256: %s\n", SHA3_BACKEND);
 	}
 }
 
@@ -818,7 +813,7 @@ int cmd_version(int argc, const char **argv, const char *prefix, struct reposito
 	struct strbuf buf = STRBUF_INIT;
 	int build_options = 0;
 	const char * const usage[] = {
-		N_("git version [--build-options]"),
+		N_("git3 version [--build-options]"),
 		NULL
 	};
 	struct option options[] = {

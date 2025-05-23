@@ -3,7 +3,7 @@
 
 int cmd__sha1(int ac, const char **av)
 {
-	return cmd_hash_impl(ac, av, GIT_HASH_SHA1, 0);
+	return cmd_hash_impl(ac, av, GIT_HASH_SHA3, 0);
 }
 
 int cmd__sha1_is_sha1dc(int argc UNUSED, const char **argv UNUSED)
@@ -16,5 +16,5 @@ int cmd__sha1_is_sha1dc(int argc UNUSED, const char **argv UNUSED)
 
 int cmd__sha1_unsafe(int ac, const char **av)
 {
-	return cmd_hash_impl(ac, av, GIT_HASH_SHA1, 1);
+	return cmd_hash_impl(ac, av, GIT_HASH_SHA3, 1);
 }

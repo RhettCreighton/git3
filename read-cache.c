@@ -3571,7 +3571,7 @@ int should_validate_cache_entries(void)
 	return validate_index_cache_entries;
 }
 
-#define EOIE_SIZE (4 + GIT_SHA1_RAWSZ) /* <4-byte offset> + <20-byte hash> */
+#define EOIE_SIZE (4 + GIT_SHA3_RAWSZ) /* <4-byte offset> + <20-byte hash> */
 #define EOIE_SIZE_WITH_HEADER (4 + 4 + EOIE_SIZE) /* <4-byte signature> + <4-byte length> + EOIE_SIZE */
 
 static size_t read_eoie_extension(const char *mmap, size_t mmap_size)

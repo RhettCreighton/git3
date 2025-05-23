@@ -9,7 +9,7 @@ int cl_setup_hash_algo(void)
 
 	if (algo < 0) {
 		const char *algo_name = getenv("GIT_TEST_DEFAULT_HASH");
-		algo = algo_name ? hash_algo_by_name(algo_name) : GIT_HASH_SHA1;
+		algo = algo_name ? hash_algo_by_name(algo_name) : GIT_HASH_SHA3;
 
 		cl_assert(algo != GIT_HASH_UNKNOWN);
 	}
