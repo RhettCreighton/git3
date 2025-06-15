@@ -262,5 +262,5 @@ Release/
 # Backup directory
 backup/
 
-# Git3 repository (large objects)
-.git3/objects/*/*
+# Git3 repository
+.git3/

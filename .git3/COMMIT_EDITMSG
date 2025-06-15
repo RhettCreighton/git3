@@ -1,4 +1,0 @@
-Ignore .git3 directories in status and file traversal
-
-Just like git ignores .git directories, git3 should ignore .git3 directories
-to avoid showing its own metadata directory as untracked.
