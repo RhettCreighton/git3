@@ -1,0 +1,4 @@
+Initial git3 repository with SHA3-256
+
+This is the initial commit of the git3 source code using SHA3-256 hashing
+and proof-of-work. All future development will be tracked in this repository.
