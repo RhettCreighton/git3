@@ -2386,7 +2386,7 @@ static enum path_treatment treat_path(struct dir_struct *dir,
 	if (!cdir->d_name)
 		return treat_path_fast(dir, cdir, istate, path,
 				       baselen, pathspec);
-	if (is_dot_or_dotdot(cdir->d_name) || !fspathcmp(cdir->d_name, ".git"))
+	if (is_dot_or_dotdot(cdir->d_name) || !fspathcmp(cdir->d_name, ".git") || !fspathcmp(cdir->d_name, ".git3"))
 		return path_none;
 	strbuf_setlen(path, baselen);
 	strbuf_addstr(path, cdir->d_name);
