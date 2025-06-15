@@ -1,4 +1,4 @@
-Initial git3 repository with SHA3-256
+Ignore .git3 directories in status and file traversal
 
-This is the initial commit of the git3 source code using SHA3-256 hashing
-and proof-of-work. All future development will be tracked in this repository.
+Just like git ignores .git directories, git3 should ignore .git3 directories
+to avoid showing its own metadata directory as untracked.
