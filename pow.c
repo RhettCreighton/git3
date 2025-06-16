@@ -2,6 +2,7 @@
 
 #include "git-compat-util.h"
 #include "pow.h"
+#include "pow_avx2.h"
 #include "hash.h"
 #include "hex.h"
 #include "object.h"
@@ -272,6 +273,9 @@ int mine_pow_tag(const struct object_id *object_oid,
     }
     
     printf("Mining proof-of-work tag (difficulty: %u bits)...\n", difficulty);
+    
+    /* Note: For interrupt handling, use pow_optimized.c functions */
+    /* TODO: Refactor to use common mining infrastructure */
     
     /* Try different nonces until we find one that meets difficulty */
     while (1) {

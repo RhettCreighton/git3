@@ -1324,6 +1324,7 @@ BUILTIN_OBJS += builtin/stripspace.o
 BUILTIN_OBJS += builtin/submodule--helper.o
 BUILTIN_OBJS += builtin/symbolic-ref.o
 BUILTIN_OBJS += builtin/tag.o
+BUILTIN_OBJS += builtin/pow-config.o
 BUILTIN_OBJS += builtin/unpack-file.o
 BUILTIN_OBJS += builtin/unpack-objects.o
 BUILTIN_OBJS += builtin/update-index.o
@@ -2069,7 +2070,13 @@ else
 	# SHA3 is the only supported hash algorithm
 	LIB_OBJS += sha3/block/sha3.o
 	LIB_OBJS += pow.o
+	LIB_OBJS += pow-config.o
+	LIB_OBJS += pow_optimized.o
+	LIB_OBJS += pow_avx2.o
+	LIB_OBJS += sha3_avx2.o
 	BASIC_CFLAGS += -DSHA3_BLK
+	# Enable AVX2 if available
+	BASIC_CFLAGS += -mavx2
 endif
 endif
 endif

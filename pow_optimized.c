@@ -10,6 +10,17 @@
 #include "repository.h"
 #include "object-file.h"
 #include "object-store.h"
+#include <signal.h>
+
+/* Global flag for interrupt handling */
+static volatile sig_atomic_t mining_interrupted = 0;
+
+/* Signal handler for interrupt */
+static void handle_interrupt(int sig)
+{
+    mining_interrupted = 1;
+    printf("\n\nMining interrupted by user (Ctrl+C)...\n");
+}
 
 /* Build commit object format in memory for fast mining */
 static int build_commit_for_mining(struct strbuf *commit_buf,
@@ -89,6 +100,15 @@ int mine_pow_commit_optimized(const struct object_id *tree_oid,
     
     printf("Mining %sproof-of-work commit (difficulty: %u bits)...\n", type_name, difficulty);
     
+    /* Set up interrupt handler */
+    struct sigaction sa, old_sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = handle_interrupt;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    mining_interrupted = 0;
+    sigaction(SIGINT, &sa, &old_sa);
+    
     /* Calculate parent's cumulative work */
     uint64_t parent_cumulative_work = 0;
     if (parent_oid) {
@@ -110,6 +130,13 @@ int mine_pow_commit_optimized(const struct object_id *tree_oid,
     
     /* Mining loop - only update nonce and hash */
     while (1) {
+        /* Check for interrupt */
+        if (mining_interrupted) {
+            printf("Mining cancelled.\n");
+            ret = -1;
+            goto cleanup;
+        }
+        
         /* Update nonce in buffer */
         char nonce_str[21];
         int nonce_len = snprintf(nonce_str, sizeof(nonce_str), "%lu", nonce);
@@ -233,6 +260,8 @@ int mine_pow_commit_optimized(const struct object_id *tree_oid,
     }
     
 cleanup:
+    /* Restore original signal handler */
+    sigaction(SIGINT, &old_sa, NULL);
     strbuf_release(&commit_buf);
     return ret;
 }

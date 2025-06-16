@@ -47,6 +47,12 @@ int mine_pow_commit(const struct object_id *tree_oid,
 /* Check if hash meets difficulty requirement */
 int check_pow_difficulty(const char *hash_hex, uint32_t difficulty);
 
+/* Get the appropriate PoW difficulty for the current branch */
+int get_pow_difficulty_for_branch(void);
+
+/* Set difficulty for a branch pattern in config */
+int set_pow_difficulty_config(const char *pattern, int difficulty);
+
 /* Mine a tag with proof-of-work */
 int mine_pow_tag(const struct object_id *object_oid,
                  const char *type,
@@ -57,5 +63,16 @@ int mine_pow_tag(const struct object_id *object_oid,
                  uint32_t difficulty,
                  struct object_id *result_oid,
                  struct pow_data *pow_out);
+
+/* Optimized mining function (uses interrupt handling) */
+int mine_pow_commit_optimized(const struct object_id *tree_oid,
+                             const struct object_id *parent_oid,
+                             const char *author,
+                             const char *committer,
+                             const char *message,
+                             enum commit_type type,
+                             uint32_t difficulty,
+                             struct object_id *result_oid,
+                             struct pow_data *pow_out);
 
 #endif /* POW_H */

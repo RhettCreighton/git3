@@ -43,6 +43,7 @@
 #include "pretty.h"
 #include "trailer.h"
 #include "pow.h"
+#include "pow_avx2.h"
 
 static const char * const builtin_commit_usage[] = {
 	N_("git commit [-a | --interactive | --patch] [-s] [-v] [-u[<mode>]] [--amend]\n"
@@ -133,6 +134,7 @@ static struct strvec trailer_args = STRVEC_INIT;
 static int pow_difficulty = GIT3_MIN_DIFFICULTY;
 static enum commit_type git3_commit_type = COMMIT_TYPE_NORMAL;
 static int is_freeze = 0, is_clean = 0;
+static int dev_mode = 0;
 
 /*
  * The default commit message cleanup mode will remove the lines
@@ -1759,6 +1761,7 @@ int cmd_commit(int argc,
 			    N_("proof-of-work difficulty in bits (minimum: 20)")),
 		OPT_BOOL(0, "freeze", &is_freeze, N_("create a freeze commit")),
 		OPT_BOOL(0, "clean", &is_clean, N_("create a clean commit")),
+		OPT_BOOL(0, "dev", &dev_mode, N_("development mode (lower PoW difficulty)")),
 		/* end commit contents options */
 
 		OPT_HIDDEN_BOOL(0, "allow-empty", &allow_empty,
@@ -1805,6 +1808,11 @@ int cmd_commit(int argc,
 	if (verbose == -1)
 		verbose = (config_commit_verbose < 0) ? 0 : config_commit_verbose;
 	
+	/* Check for dev mode environment variable */
+	if (!dev_mode && getenv("GIT3_DEV_MODE")) {
+		dev_mode = 1;
+	}
+	
 	/* Determine commit type */
 	if (is_freeze && is_clean) {
 		die(_("--freeze and --clean are mutually exclusive"));
@@ -1815,10 +1823,30 @@ int cmd_commit(int argc,
 		git3_commit_type = COMMIT_TYPE_CLEAN;
 	}
 
-	if (pow_difficulty < GIT3_MIN_DIFFICULTY) {
-		die(_("Error: Minimum difficulty is %d (1M work)"), GIT3_MIN_DIFFICULTY);
+	/* In dev mode, allow lower difficulty for faster testing */
+	int min_difficulty = dev_mode ? 1 : GIT3_MIN_DIFFICULTY;
+	
+	if (pow_difficulty < min_difficulty) {
+		if (dev_mode) {
+			die(_("Error: Minimum difficulty in dev mode is 1"));
+		} else {
+			die(_("Error: Minimum difficulty is %d (1M work). Use --dev for lower difficulty."), GIT3_MIN_DIFFICULTY);
+		}
 	} else if (pow_difficulty > 256) {
 		die(_("Error: Maximum difficulty is 256"));
+	}
+	
+	/* If dev mode and no explicit difficulty, use a lower default */
+	if (dev_mode && pow_difficulty == GIT3_MIN_DIFFICULTY) {
+		pow_difficulty = 8; /* 8 bits = 256 hashes on average */
+		fprintf(stderr, "=== Git3 Development Mode ===\n");
+		fprintf(stderr, "Using reduced difficulty: %d bits\n", pow_difficulty);
+	} else if (pow_difficulty == GIT3_MIN_DIFFICULTY && !dev_mode) {
+		/* Use branch-based difficulty if not explicitly set */
+		pow_difficulty = get_pow_difficulty_for_branch();
+		if (pow_difficulty != GIT3_MIN_DIFFICULTY) {
+			fprintf(stderr, "Using branch-based difficulty: %d bits\n", pow_difficulty);
+		}
 	}
 
 	if (cleanup_arg) {
@@ -1930,8 +1958,13 @@ int cmd_commit(int argc,
 	}
 
 	const char *type_names[] = {"Normal", "Freeze", "Clean"};
-	printf("\n=== Git3 %s Commit ===\n", type_names[git3_commit_type]);
-	printf("All commits require proof-of-work (minimum 1M hashes)\n\n");
+	if (dev_mode) {
+		printf("\n=== Git3 %s Commit (Development Mode) ===\n", type_names[git3_commit_type]);
+		printf("Using reduced difficulty: %d bits (~%d hashes)\n\n", pow_difficulty, 1 << pow_difficulty);
+	} else {
+		printf("\n=== Git3 %s Commit ===\n", type_names[git3_commit_type]);
+		printf("All commits require proof-of-work (minimum 1M hashes)\n\n");
+	}
 	
 	/* Mine the commit with proof-of-work */
 	struct pow_data pow = {0};
@@ -1943,7 +1976,8 @@ int cmd_commit(int argc,
 		parent_ptr = &parent_oid;
 	}
 	
-	if (mine_pow_commit(&the_repository->index->cache_tree->oid,
+	/* Try AVX2 optimized mining first, fall back to regular if needed */
+	if (mine_pow_commit_avx2(&the_repository->index->cache_tree->oid,
 			    parent_ptr,
 			    author_ident.buf,
 			    NULL, /* use default committer */

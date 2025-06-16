@@ -335,9 +335,16 @@ static int build_tag_object(struct strbuf *buf, int sign, struct object_id *resu
 	printf("Tag type: %s\n", tag_type_names[tag_type]);
 	printf("All tags require proof-of-work (minimum 1M hashes)\n\n");
 	
+	/* Determine difficulty based on dev mode */
+	int difficulty = GIT3_MIN_DIFFICULTY;
+	if (getenv("GIT3_DEV_MODE")) {
+		difficulty = 8; /* Reduced difficulty for development */
+		printf("Development mode: using reduced difficulty %d bits\n", difficulty);
+	}
+	
 	/* Mine the tag with proof-of-work */
 	if (mine_pow_tag(&object_oid, type_str, tag_name, tagger_str, 
-			 message_start, tag_type_names[tag_type], GIT3_MIN_DIFFICULTY, result, &pow) < 0) {
+			 message_start, tag_type_names[tag_type], difficulty, result, &pow) < 0) {
 		free(type_str);
 		free(tag_name);
 		free(tagger_str);
