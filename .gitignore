@@ -2,3 +2,39 @@
 bin-wrappers/git3
 git-pow-config
 install_to_usr_local.txt
+
+# Build artifacts - object files and binaries
+*.o
+*.a
+/git3
+/git-*
+/scalar
+/t/helper/test-*
+/t/unit-tests/*
+/.depend/
+*/.depend/
+GIT-*
+config-list.h
+command-list.h
+hook-list.h
+version-def.h
+
+# Build directories
+builtin/*.o
+compat/**/*.o
+compiler-tricks/*.o
+ewah/*.o
+negotiator/*.o
+oss-fuzz/*.o
+refs/*.o
+reftable/*.o
+sha1dc/*.o
+sha3/**/*.o
+t/**/*.o
+trace2/*.o
+xdiff/*.o
+
+# Generated files
+/gitweb/gitweb.cgi
+/gitweb/static/gitweb.js
+/gitweb/GITWEB-BUILD-OPTIONS
