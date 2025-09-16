@@ -38,3 +38,4 @@ xdiff/*.o
 /gitweb/gitweb.cgi
 /gitweb/static/gitweb.js
 /gitweb/GITWEB-BUILD-OPTIONS
+**/.depend/
